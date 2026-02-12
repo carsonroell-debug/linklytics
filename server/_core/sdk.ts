@@ -301,4 +301,11 @@ class SDKServer {
   }
 }
 
-export const sdk = new SDKServer();
+let _sdk: SDKServer | undefined;
+
+export function getSDK(): SDKServer {
+  if (!_sdk) {
+    _sdk = new SDKServer();
+  }
+  return _sdk;
+}
