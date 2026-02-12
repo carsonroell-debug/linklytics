@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { stripe } from "./stripe";
+import { getStripe } from "./stripe";
 import * as db from "./db";
 import { notifyOwner } from "./_core/notification";
 
@@ -23,7 +23,7 @@ router.post("/api/stripe/webhook", async (req, res) => {
   let event;
 
   try {
-    event = stripe.webhooks.constructEvent(
+    event = getStripe().webhooks.constructEvent(
       req.body,
       sig,
       STRIPE_WEBHOOK_SECRET

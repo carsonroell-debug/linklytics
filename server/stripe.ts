@@ -1,13 +1,21 @@
 import Stripe from "stripe";
 
-if (!process.env.STRIPE_SECRET_KEY) {
-  throw new Error("STRIPE_SECRET_KEY environment variable is not set");
+let _stripe: Stripe | undefined;
+
+function getStripe(): Stripe {
+  if (!_stripe) {
+    if (!process.env.STRIPE_SECRET_KEY) {
+      throw new Error("STRIPE_SECRET_KEY environment variable is not set");
+    }
+    _stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
+      apiVersion: "2026-01-28.clover",
+      typescript: true,
+    });
+  }
+  return _stripe;
 }
 
-export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-  apiVersion: "2026-01-28.clover",
-  typescript: true,
-});
+export { getStripe };
 
 /**
  * Create a Stripe customer for a user
@@ -17,7 +25,7 @@ export async function createStripeCustomer(params: {
   name?: string;
   userId: number;
 }) {
-  const customer = await stripe.customers.create({
+  const customer = await getStripe().customers.create({
     email: params.email,
     name: params.name,
     metadata: {
@@ -40,7 +48,7 @@ export async function createCheckoutSession(params: {
   successUrl: string;
   cancelUrl: string;
 }) {
-  const session = await stripe.checkout.sessions.create({
+  const session = await getStripe().checkout.sessions.create({
     mode: "subscription",
     payment_method_types: ["card"],
     line_items: [
@@ -74,7 +82,7 @@ export async function createCheckoutSession(params: {
  * Cancel a subscription
  */
 export async function cancelSubscription(subscriptionId: string) {
-  const subscription = await stripe.subscriptions.cancel(subscriptionId);
+  const subscription = await getStripe().subscriptions.cancel(subscriptionId);
   return subscription;
 }
 
@@ -82,7 +90,7 @@ export async function cancelSubscription(subscriptionId: string) {
  * Get customer's subscriptions
  */
 export async function getCustomerSubscriptions(customerId: string) {
-  const subscriptions = await stripe.subscriptions.list({
+  const subscriptions = await getStripe().subscriptions.list({
     customer: customerId,
     status: "all",
     limit: 10,
@@ -98,7 +106,7 @@ export async function createPortalSession(params: {
   customerId: string;
   returnUrl: string;
 }) {
-  const session = await stripe.billingPortal.sessions.create({
+  const session = await getStripe().billingPortal.sessions.create({
     customer: params.customerId,
     return_url: params.returnUrl,
   });

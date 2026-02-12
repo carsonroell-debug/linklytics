@@ -1,0 +1,19 @@
+{
+  "version": 2,
+  "buildCommand": "vite build",
+  "outputDirectory": "dist/public",
+  "framework": null,
+  "rewrites": [
+    { "source": "/api/(.*)", "destination": "/api" },
+    { "source": "/dashboard", "destination": "/index.html" },
+    { "source": "/links", "destination": "/index.html" },
+    { "source": "/analytics", "destination": "/index.html" },
+    { "source": "/docs", "destination": "/index.html" },
+    { "source": "/subscription", "destination": "/index.html" },
+    { "source": "/campaigns/:path*", "destination": "/index.html" },
+    { "source": "/webhooks", "destination": "/index.html" },
+    { "source": "/404", "destination": "/index.html" },
+    { "source": "/link/:path*", "destination": "/index.html" },
+    { "source": "/:slug", "destination": "/api" }
+  ]
+}
